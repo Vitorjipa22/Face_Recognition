@@ -1,0 +1,115 @@
+from PIL import Image
+import cv2
+import numpy as np
+from mtcnn.mtcnn import MTCNN
+from tensorflow.keras.models import load_model
+
+def extract_face(image, box, required_size = (160,160)):
+    
+    pixels = np.asarray(image)
+
+    x1, y1, width, height = box
+
+    x1, y1 = abs(x1), abs(y1)
+    x2, y2 = x1 + width, y1 + height
+
+    face = pixels[y1:y2, x1:x2]
+
+    image = Image.fromarray(face)
+    image = image.resize(required_size)
+
+    return np.asarray(image)
+
+def get_embedding(facenet, face_pixels):
+    
+    face_pixels = face_pixels.astype('float32')
+
+    #Padronização
+    mean, std = face_pixels.mean(), face_pixels.std()
+    face_pixels = (face_pixels - mean)/std
+    
+    #transformar a face em 1 unico exemplo
+    
+    # (160,160) -> (1,160,160)
+    
+    samples = np.expand_dims(face_pixels, axis=0)
+    
+    #Realizar a predição gerando o embedding
+    yhat = model.predict(samples)
+    
+    return yhat[0]
+
+
+pessoas = ['steferson','glau','anino']
+num_classes = len(pessoas)
+cap = cv2.VideoCapture(0)
+
+detector = MTCNN()
+facenet = load_model('facenet_keras.h5')
+model = load_model('faces.h5')
+
+while True:
+
+    _, frame = cap.read()
+
+    faces = detector.detect_faces(frame)
+
+    for face in faces:
+
+        confidence = face['confidence']*100
+
+        if confidence >= 98:
+            
+            x1, y1, w, h = face['box']
+            face = extract_face(frame, face['box'])
+
+            face = face.astype('float32')/255 #normalizando a imagem
+
+            emb = get_embedding(facenet, face)
+
+            tensor = np.expand_dims(emb, axis = 0) #expandindo para possibilitar varias faces
+
+            classe = model.predict_classes(tensor)[0]
+
+            prob = model.predict_proba(tensor)
+            prob = prob[0][classe]*100
+
+            user = str(pessoas[classe]).upper()
+
+            color = (225,105,65)
+
+            cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
+
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+
+            cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
+
+    cv2.imshow("FACE_RECOGNITION", frame)
+
+    key = cv2.waitKey(1)
+
+    if key == 27:
+        break
+
+cap.release()
+cv2.destroyAllWindows
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
