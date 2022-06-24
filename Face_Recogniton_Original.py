@@ -1,8 +1,14 @@
-from PIL import Image
+import tensorflow 
 import cv2
 import numpy as np
+import time as tm
+import pandas as pd
+
 from mtcnn.mtcnn import MTCNN
-from tensorflow.keras.models import load_model
+from datetime import datetime
+from PIL import Image
+from numpy import asarray
+
 
 def extract_face(image, box, required_size = (160,160)):
     
@@ -10,7 +16,6 @@ def extract_face(image, box, required_size = (160,160)):
 
     x1, y1, width, height = box
 
-    x1, y1 = abs(x1), abs(y1)
     x2, y2 = x1 + width, y1 + height
 
     face = pixels[y1:y2, x1:x2]
@@ -29,28 +34,45 @@ def get_embedding(facenet, face_pixels):
     face_pixels = (face_pixels - mean)/std
     
     #transformar a face em 1 unico exemplo
-    
     # (160,160) -> (1,160,160)
-    
     samples = np.expand_dims(face_pixels, axis=0)
     
     #Realizar a predição gerando o embedding
-    yhat = model.predict(samples)
+    yhat = facenet.predict(samples)
     
     return yhat[0]
+moradores = pd.read_csv("moradores.csv")
+moradores = moradores.drop(["Unnamed: 0"], axis = 1)
 
+print(moradores.head())
+pessoas = asarray(moradores)[0]
+print(pessoas)
 
-pessoas = ['steferson','glau','anino']
+df = pd.read_csv("faces.csv")
+
+df = df.drop(["Unnamed: 0"], axis = 1)
+
 num_classes = len(pessoas)
 cap = cv2.VideoCapture(0)
 
 detector = MTCNN()
-facenet = load_model('facenet_keras.h5')
-model = load_model('faces.h5')
+facenet = tensorflow.keras.models.load_model('facenet_keras.h5')
+model = tensorflow.keras.models.load_model('faces.h5')
+
+
+liberado = True
+time = 0
+color_desconhecido = (0,0,255)
+color = (0,255,0)
+font_scale = 0.5
+font = cv2.FONT_HERSHEY_SIMPLEX
+time = int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S'))
+tm.sleep(2)
 
 while True:
 
     _, frame = cap.read()
+    frame = cv2.flip(frame, 1)
 
     faces = detector.detect_faces(frame)
 
@@ -58,32 +80,38 @@ while True:
 
         confidence = face['confidence']*100
 
-        if confidence >= 98:
+        if confidence >= 96:
             
             x1, y1, w, h = face['box']
-            face = extract_face(frame, face['box'])
 
+            face = extract_face(frame, face['box'])
             face = face.astype('float32')/255 #normalizando a imagem
 
             emb = get_embedding(facenet, face)
-
             tensor = np.expand_dims(emb, axis = 0) #expandindo para possibilitar varias faces
 
-            classe = model.predict_classes(tensor)[0]
+            predict_x=model.predict(tensor) 
+            classe=np.argmax(predict_x,axis=1)
 
-            prob = model.predict_proba(tensor)
-            prob = prob[0][classe]*100
+            user = str(pessoas[classe[0]]).upper()
 
-            user = str(pessoas[classe]).upper()
+            if (classe[0]*100) >= 98:
 
-            color = (225,105,65)
+                liberado = True if classe != 2 else False
 
-            cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
+                if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) <= time+3):
+                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
+                    cv2.putText(frame, usertemp, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
 
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 0.5
-
-            cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
+                if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) > time+3):
+                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color_desconhecido, 2)
+                    cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color_desconhecido, thickness = 1)
+                
+                if liberado:
+                    time = int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S'))
+                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
+                    cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
+                    usertemp = user
 
     cv2.imshow("FACE_RECOGNITION", frame)
 
@@ -92,24 +120,12 @@ while True:
     if key == 27:
         break
 
+    if key == 13:
+        print(predict_x)
+        tm.sleep(10)
+
+
+        
+
 cap.release()
 cv2.destroyAllWindows
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
