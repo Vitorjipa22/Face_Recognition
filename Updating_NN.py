@@ -1,13 +1,11 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from numpy import asarray
 
 from sklearn.utils import shuffle
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
 
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import models
@@ -21,7 +19,7 @@ class Updating_NN:
         pass
     
     def concats(self):
-        self.df = pd.read_csv("faces.csv")
+        self.df.read_csv("faces.csv")
         self.df = self.df.drop(["Unnamed: 0"], axis = 1)
 
         self.df_novo = pd.read_csv("novo_morador.csv")
@@ -66,6 +64,7 @@ class Updating_NN:
 
         moradores.append(asarray(pessoas))
         moradores = pd.DataFrame(data=moradores)
+
         moradores.to_csv("moradores.csv")
 
 

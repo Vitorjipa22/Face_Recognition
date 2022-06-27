@@ -11,7 +11,6 @@ from numpy import asarray
 
 
 def extract_face(image, box, required_size = (160,160)):
-    
     pixels = np.asarray(image)
 
     x1, y1, width, height = box
@@ -26,7 +25,6 @@ def extract_face(image, box, required_size = (160,160)):
     return np.asarray(image)
 
 def get_embedding(facenet, face_pixels):
-    
     face_pixels = face_pixels.astype('float32')
 
     #Padronização
@@ -41,6 +39,7 @@ def get_embedding(facenet, face_pixels):
     yhat = facenet.predict(samples)
     
     return yhat[0]
+    
 moradores = pd.read_csv("moradores.csv")
 moradores = moradores.drop(["Unnamed: 0"], axis = 1)
 
