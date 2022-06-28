@@ -11,6 +11,7 @@ from numpy import asarray
 
 
 def extract_face(image, box, required_size = (160,160)):
+
     pixels = np.asarray(image)
 
     x1, y1, width, height = box
@@ -25,6 +26,7 @@ def extract_face(image, box, required_size = (160,160)):
     return np.asarray(image)
 
 def get_embedding(facenet, face_pixels):
+
     face_pixels = face_pixels.astype('float32')
 
     #Padronização
@@ -122,9 +124,8 @@ while True:
     if key == 13:
         print(predict_x)
         tm.sleep(10)
-
-
-        
+    else:
+        print(key)
 
 cap.release()
 cv2.destroyAllWindows

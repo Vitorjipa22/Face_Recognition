@@ -8,46 +8,44 @@ from cv2 import VideoCapture
 from numpy import asarray
 from sklearn.utils import shuffle
 
-
 from Getting_embedds import Getting_embedds
 from Updating_NN import Updating_NN
 
+print('esse codigo nao é de um burro')
 cont = 0
 
 webcam = VideoCapture(0)
 sucess, frame = webcam.read()
 
 ge = Getting_embedds()
-Updating_NN = Updating_NN()
+UN = Updating_NN()
 
 os.chdir(r'fotos')
 
 ok = "ok"
 
-
 if __name__ == "__main__":
-
-
 
     if webcam.isOpened():
         capturando = False
         fotografado = False
         salvo = False
         atualizado = False
+
         while not atualizado:
             sucess, frame = webcam.read()
-
             key = cv2.waitKey(5)
 
-            if key == 27:
+            if key == 27: # usuario apertando esc
                 break
 
             cv2.imshow("testando", frame)
 
             if key == 13:
-                # capturando = True
-                # morador = input("Digite o nome do morador: ")
-                morador = 'damares'
+                capturando = True
+
+                morador = input("Digite o nome do morador: ")
+                capturando = False
                 fotografado = True
 
             if capturando:
@@ -62,9 +60,7 @@ if __name__ == "__main__":
                     fotografado = True
         
             if fotografado:
-                
-                
-                os.chdir(r"C:\Users\VCHAGAS\Documents\Python Scripts\Face-Recognition-main\\")
+                os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\\")
                 print(ok)
                 trainX = ge.load_fotos()
 
@@ -100,30 +96,25 @@ if __name__ == "__main__":
 
             if salvo:
                 try:
-                    df = Updating_NN.concats()
+                    print('entrou')
+                    df = UN.concats()
                     print('definiu df')
                     n_classes  = len(df.target.unique())
                     print('numero de classes', n_classes)
-                    trainX,trainy = Updating_NN.separando_dados(df)
+                    trainX,trainy = UN.separando_dados(df)
                     print('definiou o traino')
-                    Updating_NN.updating_NN(trainX, trainy, n_classes,df)
+                    UN.updating_NN(trainX, trainy, n_classes,df, morador = morador)
                     print('atualizou a rede')
                     atualizado = True
                     print("salvo")
-                except:
+                except Exception as e:
                     print("Erro ao atualizar modelo")
+                    print(e)
+                    
                     break
                 
             if atualizado:
                 print("fim do cadastramento")
-            
-
-
-
-
-        
-        
-    
 
 webcam.release()
 cv2.destroyAllWindows()

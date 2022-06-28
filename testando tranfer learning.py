@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn import svm
 
 from tensorflow.keras.utils import to_categorical

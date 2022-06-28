@@ -9,11 +9,6 @@ from os import listdir
 
 detector = MTCNN()
 
-moradores = list()
-moradores.append(asarray(['anino', 'desconhecido', 'glauciane', 'steferson', 'vitor']))
-moradores = pd.DataFrame(data=moradores)
-moradores.to_csv("moradores.csv")
-
 class Getting_embedds:
     def __init__(self) -> None:
          pass
@@ -44,7 +39,7 @@ class Getting_embedds:
 
     def load_fotos(self):
         self.allfaces = list()
-        self.directory_scr = r"C:\Users\VCHAGAS\Documents\Python Scripts\Face-Recognition-main\fotos\\"
+        self.directory_scr = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\fotos\\"
         
         for self.filename in listdir(self.directory_scr):
             
