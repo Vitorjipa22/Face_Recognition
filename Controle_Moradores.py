@@ -1,7 +1,7 @@
 import pandas as pd
 from numpy import asarray
 
-import Updating_NN as UN
+from Updating_NN import Updating_NN
 
 class Controle_Moradores:
     def __init__(self):
@@ -37,18 +37,29 @@ class Controle_Moradores:
                 print("Falha retirar morador do arquivo csv")
                 print('ERROR: ',e)
 
-    def Updataing_NN(self):
+    def Updating_NN(self):
+        UN = Updating_NN()
+
         try:
+            print('entrou')
             df = pd.read_csv('faces.csv')
+            try:
+                df = df.drop(['Unnamed: 0'], axis = 1)
+                df = df.drop(['Unnamed: 0.1'], axis = 1)
+            except:
+                pass
+
+            print(df.head())
             n_classes  = len(df.target.unique())
 
             trainX,trainy = UN.separando_dados(df)
-            UN.updating_NN(trainX, trainy, n_classes, df)
+            UN.updating_NN_new(trainX, trainy, n_classes, df)
 
         except Exception as e:
             print("Falha os atualizar modelo")
             print('ERROR: ',e)
 
-if __name__ == 'main':
+if __name__ == '__main__':
+    print('começou')
     CE = Controle_Moradores()
     CE.Updating_NN()

@@ -42,9 +42,12 @@ class Updating_NN:
 
         self.out_encoder = LabelEncoder() # enumerando as saidas
         self.out_encoder.fit(self.trainY)
+        print(self.trainY)
         self.trainY = self.out_encoder.transform(self.trainY)
+        print(self.trainY)
 
         self.trainY = to_categorical(self.trainY)
+        print(self.trainY)
 
         return self.trainX,self.trainY
 
@@ -54,12 +57,13 @@ class Updating_NN:
         self.model.add(layers.Dense(64, activation = 'relu', input_shape = (128,)))
         self.model.add(layers.Dropout(0.5))
         self.model.add(layers.Dense(n_classes, activation = 'softmax'))
+        print('n_classes :', n_classes)
         
         # print(self.morador)
         print('definiu o modelo')
 
         self.model.compile(optimizer="adam", loss= "categorical_crossentropy", metrics=['accuracy'])
-
+        print('trainY: ',trainY)
         self.model.fit(trainX, trainY, epochs=20, batch_size = 8)
 
         moradores = list()
@@ -79,7 +83,7 @@ class Updating_NN:
         print(moradores)
 
         moradores = pd.DataFrame(data=moradores)
-
+        
         df.to_csv('faces.csv')
         moradores.to_csv("moradores.csv")
         self.model.save("faces.h5")
