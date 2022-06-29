@@ -28,28 +28,22 @@ def get_embedding(facenet, face_pixels):
 
     face_pixels = face_pixels.astype('float32')
 
-    #Padronização
     mean, std = face_pixels.mean(), face_pixels.std()
     face_pixels = (face_pixels - mean)/std
     
-    #transformar a face em 1 unico exemplo
-    # (160,160) -> (1,160,160)
     samples = np.expand_dims(face_pixels, axis=0)
     
-    #Realizar a predição gerando o embedding
     yhat = facenet.predict(samples)
     
     return yhat[0]
     
 moradores = pd.read_csv("moradores.csv")
-moradores = moradores.drop(["Unnamed: 0"], axis = 1)
+moradores = moradores.moradores
+moradores = list(moradores)
 
-print(moradores.head())
-pessoas = asarray(moradores)[0]
-print(pessoas)
+pessoas = asarray(moradores)
 
 df = pd.read_csv("faces.csv")
-
 df = df.drop(["Unnamed: 0"], axis = 1)
 
 num_classes = len(pessoas)
@@ -123,7 +117,8 @@ while True:
     if key == 13:
         print(predict_x)
         tm.sleep(10)
-    else:
+    
+    if key != 27 and key != 13 and key != -1:
         print(key)
 
 cap.release()

@@ -6,12 +6,11 @@ import tensorflow
 
 from cv2 import VideoCapture 
 from numpy import asarray
-from sklearn.utils import shuffle
 
 from Getting_embedds import Getting_embedds
 from Updating_NN import Updating_NN
+from Controle_Moradores import Controle_Moradores
 
-print('esse codigo nao é de um burro')
 cont = 0
 
 webcam = VideoCapture(0)
@@ -19,6 +18,7 @@ sucess, frame = webcam.read()
 
 ge = Getting_embedds()
 UN = Updating_NN()
+CE = Controle_Moradores()
 
 os.chdir(r'fotos')
 
@@ -47,6 +47,17 @@ if __name__ == "__main__":
                 morador = input("Digite o nome do morador: ")
                 capturando = False
                 fotografado = True
+            
+            if key == 57:
+                os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\\")
+                ex_morador = input("digite o morador a ser retirado: ")
+                existe = CE.Retirando_morador(ex_morador=ex_morador)
+
+                if existe == -1:
+                    UN.updating_NN()
+
+                else:
+                    print('Morador não encontrado')
 
             if capturando:
                 
@@ -93,20 +104,11 @@ if __name__ == "__main__":
                 salvo = True
                 print("fotografado")
              
-
             if salvo:
                 try:
-                    print('entrou')
-                    df = UN.concats()
-                    print('definiu df')
-                    n_classes  = len(df.target.unique())
-                    print('numero de classes', n_classes)
-                    trainX,trainy = UN.separando_dados(df)
-                    print('definiou o traino')
-                    UN.updating_NN_new(trainX, trainy, n_classes,df, morador = morador)
-                    print('atualizou a rede')
+                    UN.updating_NN(morador = morador)
                     atualizado = True
-                    print("salvo")
+
                 except Exception as e:
                     print("Erro ao atualizar modelo")
                     print(e)

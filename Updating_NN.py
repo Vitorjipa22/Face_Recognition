@@ -19,19 +19,13 @@ class Updating_NN:
         pass
     
     def concats(self):
-        print('entrou')
         os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition")
-        print(os.getcwd())
+
         self.df = pd.read_csv("faces.csv")
-        print('leu o dataset')
         self.df = self.df.drop(["Unnamed: 0"], axis = 1)
-        print('dropou a coluna inutil')
-
         self.df_novo = pd.read_csv("novo_morador.csv")
-        print('leu o novo morador')
         self.df_novo = self.df_novo.drop(["Unnamed: 0"], axis = 1)
-        print('terminou')
-
+        
         return pd.concat([self.df,self.df_novo])
 
     def separando_dados(self,df):
@@ -42,54 +36,60 @@ class Updating_NN:
 
         self.out_encoder = LabelEncoder() # enumerando as saidas
         self.out_encoder.fit(self.trainY)
-        print(self.trainY)
+
+        moradores = pd.DataFrame()
+        moradores['moradores'] = self.trainY
+        pessoas = asarray(moradores.moradores.unique())
+
+        csv_moradores = pd.DataFrame()
+        csv_moradores['moradores'] = pessoas
+        csv_moradores.to_csv('moradores.csv')
+
         self.trainY = self.out_encoder.transform(self.trainY)
-        print(self.trainY)
 
         self.trainY = to_categorical(self.trainY)
-        print(self.trainY)
 
         return self.trainX,self.trainY
 
-    def updating_NN_new(self,trainX, trainY, n_classes, df, morador = None):
-        print('entrou')
+    def updating_NN(self, morador = None):
+        if morador != None:
+            df = self.concats()
+            pessoas = pd.read_csv("moradores.csv")
+            pessoas = moradores.moradores
+            pessoas = list(moradores)
+            pessoas.append(morador)
+
+            moradores = pd.DataFrame(data= asarray(pessoas))
+            moradores.to_csv("moradores.csv")
+        else:
+            df = pd.read_csv('faces.csv')
+        
+        try:
+            df = df.drop(['Unnamed: 0'], axis=1)
+            df = df.drop(['Unnamed: 0.1'], axis =1)
+            df = df.drop(['Unnamed: 0.1.1'], axis =1)
+            df = df.drop(['Unnamed: 0.1.1.1'], axis =1)
+        except:
+            pass
+
+        n_classes = len(df.target.unique())
+        trainX, trainY = self.separando_dados(df)
+        
         self.model = models.Sequential()
         self.model.add(layers.Dense(64, activation = 'relu', input_shape = (128,)))
         self.model.add(layers.Dropout(0.5))
         self.model.add(layers.Dense(n_classes, activation = 'softmax'))
-        print('n_classes :', n_classes)
         
-        # print(self.morador)
-        print('definiu o modelo')
-
         self.model.compile(optimizer="adam", loss= "categorical_crossentropy", metrics=['accuracy'])
-        print('trainY: ',trainY)
         self.model.fit(trainX, trainY, epochs=20, batch_size = 8)
-
-        moradores = list()
-        self.antigos_moradores = pd.read_csv("moradores.csv")
-        self.antigos_moradores = self.antigos_moradores.drop(["Unnamed: 0"], axis = 1)
-        print('leu e tratou os datasets')
-        pessoas = asarray(self.antigos_moradores)[0]
-        pessoas = list(pessoas)
-
-        if morador != None:
-            self.morador = morador
-            pessoas.append(self.morador)
         
-        print(pessoas)
-        
-        moradores.append(asarray(pessoas))
-        print(moradores)
-
-        moradores = pd.DataFrame(data=moradores)
         
         df.to_csv('faces.csv')
-        moradores.to_csv("moradores.csv")
         self.model.save("faces.h5")
 
 if __name__ == "__main__":
-        pass
+        UN = Updating_NN()
+        UN.updating_NN()
 
 
 
