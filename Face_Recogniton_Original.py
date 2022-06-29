@@ -15,7 +15,6 @@ def extract_face(image, box, required_size = (160,160)):
     pixels = np.asarray(image)
 
     x1, y1, width, height = box
-
     x2, y2 = x1 + width, y1 + height
 
     face = pixels[y1:y2, x1:x2]

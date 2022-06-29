@@ -48,7 +48,7 @@ class Updating_NN:
 
         return self.trainX,self.trainY
 
-    def updating_NN(self,trainX, trainY, n_classes, df, morador = None):
+    def updating_NN_new(self,trainX, trainY, n_classes, df, morador = None):
         print('entrou')
         self.model = models.Sequential()
         self.model.add(layers.Dense(64, activation = 'relu', input_shape = (128,)))
@@ -80,9 +80,9 @@ class Updating_NN:
 
         moradores = pd.DataFrame(data=moradores)
 
-        # df.to_csv('faces.csv')
+        df.to_csv('faces.csv')
         moradores.to_csv("moradores.csv")
-        # self.model.save("faces.h5")
+        self.model.save("faces.h5")
 
 if __name__ == "__main__":
         pass

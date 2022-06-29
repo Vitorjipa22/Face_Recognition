@@ -103,7 +103,7 @@ if __name__ == "__main__":
                     print('numero de classes', n_classes)
                     trainX,trainy = UN.separando_dados(df)
                     print('definiou o traino')
-                    UN.updating_NN(trainX, trainy, n_classes,df, morador = morador)
+                    UN.updating_NN_new(trainX, trainy, n_classes,df, morador = morador)
                     print('atualizou a rede')
                     atualizado = True
                     print("salvo")
