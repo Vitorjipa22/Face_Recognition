@@ -9,7 +9,6 @@ from datetime import datetime
 from PIL import Image
 from numpy import asarray
 
-
 def extract_face(image, box, required_size = (160,160)):
 
     pixels = np.asarray(image)
@@ -36,8 +35,10 @@ def get_embedding(facenet, face_pixels):
     yhat = facenet.predict(samples)
     
     return yhat[0]
-    
+
+
 moradores = pd.read_csv("moradores.csv")
+print(moradores.head())
 moradores = moradores.moradores
 moradores = list(moradores)
 
@@ -52,7 +53,6 @@ cap = cv2.VideoCapture(0)
 detector = MTCNN()
 facenet = tensorflow.keras.models.load_model('facenet_keras.h5')
 model = tensorflow.keras.models.load_model('faces.h5')
-
 
 liberado = True
 time = 0
@@ -84,24 +84,26 @@ while True:
             emb = get_embedding(facenet, face)
             tensor = np.expand_dims(emb, axis = 0) #expandindo para possibilitar varias faces
 
-            predict_x=model.predict(tensor) 
-            classe=np.argmax(predict_x,axis=1)
+            predict_x=model.predict(tensor)[0]
+            classe=np.argmax(predict_x)
+            user = str(pessoas[classe]).upper()
 
-            user = str(pessoas[classe[0]]).upper()
+            if (predict_x[0]*100) >= 98:
 
-            if (classe[0]*100) >= 98:
-
-                liberado = True if classe != 2 else False
+                liberado = True if classe != 0 else False
 
                 if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) <= time+3):
+   
                     cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
                     cv2.putText(frame, usertemp, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
 
                 if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) > time+3):
+  
                     cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color_desconhecido, 2)
                     cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color_desconhecido, thickness = 1)
                 
                 if liberado:
+    
                     time = int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S'))
                     cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
                     cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)

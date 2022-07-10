@@ -33,10 +33,11 @@ class Updating_NN:
         self.y = np.array(df.target)
 
         self.trainX, self.trainY = shuffle(self.X, self.y, random_state = 0) # misturando tudo 
+        print(self.trainY[0])
 
         self.out_encoder = LabelEncoder() # enumerando as saidas
         self.out_encoder.fit(self.trainY)
-
+        
         moradores = pd.DataFrame()
         moradores['moradores'] = self.trainY
         pessoas = asarray(moradores.moradores.unique())
@@ -46,8 +47,10 @@ class Updating_NN:
         csv_moradores.to_csv('moradores.csv')
 
         self.trainY = self.out_encoder.transform(self.trainY)
+        print(self.trainY[0])
 
         self.trainY = to_categorical(self.trainY)
+        print(self.trainY[0])
 
         return self.trainX,self.trainY
 
@@ -88,8 +91,13 @@ class Updating_NN:
         self.model.save("faces.h5")
 
 if __name__ == "__main__":
-        UN = Updating_NN()
-        UN.updating_NN()
+        # UN = Updating_NN()
+        # mora = pd.read_csv('faces.csv')
+        # UN.updating_NN()
+
+        # f1, f2 = UN.separando_dados(mora)
+        lista = [1.0,2.0,3.0,4.0]
+        print(np.argmax(lista))
 
 
 
