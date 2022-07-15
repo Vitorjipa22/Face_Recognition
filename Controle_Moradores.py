@@ -1,43 +1,110 @@
+import cv2
+import time 
+import os
 import pandas as pd
+import tensorflow
+
+from cv2 import VideoCapture 
 from numpy import asarray
+from Getting_embedds import Getting_embedds
+from Updating_NN import Updating_NN
+from Retirando_Morador import Retirando_Morador
 
-class Controle_Moradores:
-    def __init__(self):
-        pass
+cont = 0
 
-    def Retirando_morador(self, ex_morador):
-        # Retirando o morador da lista de moradores 
-        j = 0
-        try:
-            self.faces = pd.read_csv('faces.csv')
-            self.truzinho = self.faces.target != ex_morador 
-            self.faces = self.faces[self.truzinho]
+webcam = VideoCapture(0)
+sucess, frame = webcam.read()
 
-            self.moradores = pd.read_csv("moradores.csv")
-            self.pessoas = self.moradores.moradores
-            self.pessoas = list(self.pessoas)
+ge = Getting_embedds()
+UN = Updating_NN()
+CE = Retirando_Morador()
 
-            for i in self.pessoas:
-                if i == ex_morador:
-                    del(self.pessoas[j])
-                    j = -1
-                    break
+os.chdir(r'fotos')
+
+ok = "ok"
+
+if __name__ == "__main__":
+    path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main"
+    path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main\fotos"
+
+    if webcam.isOpened():
+        capturando = False
+        fotografado = False
+        salvo = False
+        atualizado = False
+
+        while not atualizado:
+            sucess, frame = webcam.read()
+            key = cv2.waitKey(5)
+
+            if key == 27: # usuario apertando esc
+                break
+
+            cv2.imshow("testando", frame)
+
+            if key == 13:
+                capturando = True
+
+                morador = input("Digite o nome do morador: ")
+            
+            if key == 57:
+                os.chdir(path)
+                ex_morador = input("digite o morador a ser retirado: ")
+                if ex_morador != "desconhecido":
+                    existe = CE.Retirando_morador(ex_morador=ex_morador)
                 else:
-                    j += 1
+                    print('Morador invalido digite novemente!')
 
-            print(self.pessoas)
-            self.moradores = pd.DataFrame(data=asarray(self.pessoas))
+                if existe == -1:
+                    UN.updating_NN()
 
-            self.faces = self.faces.drop(["Unnamed: 0"], axis = 1)
-            self.faces.to_csv('faces.csv')
-            print(self.moradores)
-            self.moradores.to_csv('moradores.csv')
+                else:
+                    print('Morador não encontrado')
+
+            if capturando:
+                cont = cont + 1 
+
+                os.chdir(path_foto)
+                cv2.imwrite("foto" + str(cont) + ".jpg", frame)
+                time.sleep(0.5)
+
+                if cont > 20:
+                    capturando = False
+                    fotografado = True
         
-        except Exception as e:
-                print("Falha retirar morador do arquivo csv")
-                print('ERROR: ',e)
+            if fotografado:
+                os.chdir(path)
+                trainX = ge.load_fotos()
 
-        return j
+                newTrainX = list()
+                
+                facenet = tensorflow.keras.models.load_model('facenet_keras.h5')
 
-if __name__ == '__main__':
-    pass
+                for face_pixels in trainX:
+                    embedding = ge.get_embedding(facenet, face_pixels)
+                    newTrainX.append(embedding)
+        
+                newTrainX = asarray(newTrainX)
+                df = pd.DataFrame(data = newTrainX)
+                    
+                trainy = [morador]*42
+                df['target'] = trainy
+                df.to_csv("novo_morador.csv")
+
+                salvo = True
+             
+            if salvo:
+                try:
+                    UN.updating_NN(morador = morador)
+                    atualizado = True
+
+                except Exception as e:
+                    print("Erro ao atualizar modelo")
+                    print(e)
+                    break
+                
+            if atualizado:
+                print("fim do cadastramento")
+
+webcam.release()
+cv2.destroyAllWindows()

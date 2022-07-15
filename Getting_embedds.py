@@ -11,7 +11,8 @@ detector = MTCNN()
 
 class Getting_embedds:
     def __init__(self) -> None:
-         pass
+        self.path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main"
+        self.path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main\fotos"
 
     def flip_image(self,image):
 
@@ -39,10 +40,10 @@ class Getting_embedds:
 
     def load_fotos(self):
         self.allfaces = list()
-        self.directory_scr = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\fotos\\"
+        self.directory_scr = self.path_foto
         
         for self.filename in listdir(self.directory_scr):
-            
+
             self.path = self.directory_scr + self.filename
 
             try:
