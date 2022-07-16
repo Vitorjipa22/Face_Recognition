@@ -11,8 +11,8 @@ detector = MTCNN()
 
 class Getting_embedds:
     def __init__(self) -> None:
-        self.path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main"
-        self.path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main\fotos"
+        self.path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition"
+        self.path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\fotos\\"
 
     def flip_image(self,image):
 

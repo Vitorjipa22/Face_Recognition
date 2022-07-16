@@ -24,8 +24,8 @@ os.chdir(r'fotos')
 ok = "ok"
 
 if __name__ == "__main__":
-    path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main"
-    path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main\fotos"
+    path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition"
+    path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\fotos"
 
     if webcam.isOpened():
         capturando = False

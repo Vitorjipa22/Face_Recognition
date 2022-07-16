@@ -12,8 +12,8 @@ from sklearn.preprocessing import Normalizer
 
 class Updating_NN:
     def __init__(self) -> None:
-        self.path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main"
-        self.path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main\fotos"
+        self.path = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition"
+        self.path_foto = r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition\fotos"
         pass
     
     def definindo_moradores(self,trainY):
@@ -37,7 +37,7 @@ class Updating_NN:
         return pessoas
 
     def concats(self):
-        os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition-main")
+        os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition")
 
         self.df = pd.read_csv("faces.csv")
         self.df = self.df.drop(["Unnamed: 0"], axis = 1)
