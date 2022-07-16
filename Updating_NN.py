@@ -37,7 +37,7 @@ class Updating_NN:
         return pessoas
 
     def concats(self):
-        os.chdir(r"C:\Users\VCHAGAS\Documents\GitHub\Face_Recognition")
+        os.chdir(self.path)
 
         self.df = pd.read_csv("faces.csv")
         self.df = self.df.drop(["Unnamed: 0"], axis = 1)
@@ -74,6 +74,7 @@ class Updating_NN:
             pessoas = pessoas.moradores
             pessoas = list(pessoas)
             pessoas.append(morador)
+            print(pessoas)
 
             moradores = pd.DataFrame(data= asarray(pessoas))
             moradores.to_csv("moradores.csv")

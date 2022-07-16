@@ -88,7 +88,7 @@ while True:
 
             if (predict_x[classe]*100) >= 98:
 
-                liberado = True if user != 'DESCONHECIDO' else False
+                liberado = True if user != 'DESCONHECIDOS' else False
 
                 if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) <= time+3):
    

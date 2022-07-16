@@ -96,6 +96,7 @@ if __name__ == "__main__":
             if salvo:
                 try:
                     UN.updating_NN(morador = morador)
+                    UN.updating_NN()
                     atualizado = True
 
                 except Exception as e:
