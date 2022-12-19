@@ -18,7 +18,7 @@ Para usar o reconhecimento em tempo real basta rodar o programa **Face_Recogniti
 
 ## Conclusão
 
-A rede neural se provou melhor que os outro métodos quanto o numero de moradores aumenta e em segundo lugar ficou o SVM com uma precisão bem satisfatória. Logo, a rede neural foi o unico método utlizado para rodar o programa em tempo real. Voce pode ver a comparação dos métodos no arquivo **Avaliando_Modelos.**
+A rede neural se provou melhor que os outro métodos quanto o numero de moradores aumenta e em segundo lugar ficou o SVM com uma precisão bem satisfatória. Logo, a rede neural foi o unico método utlizado para rodar o programa em tempo real. Voce pode ver a comparação dos métodos no arquivo **Avaliando_Modelos.py.**
 
 
 
