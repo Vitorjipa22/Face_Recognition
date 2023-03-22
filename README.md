@@ -2,7 +2,7 @@
 
 ## Introdução
 
-Este programa tem a função de fazer o controle de entrada e saida de moradores em um condominio onde os moradores são cadastrados previamente e verificados por imagem. Foram testados três métodos para fazer o reconhecimento dos moradores, o KNN, o SVM e uma rede neural. 
+Este programa tem a função de fazer a detecção e a identificação facial. Caso a pessoa esteja com cadastrada o algoritmo deve reconhecer a pessoa e mostrar o seu nome. Caso a pessoa não esteja no banco de dados ela deve ser classificada como desconhecida
 
 ## Instalação
 
