@@ -1,6 +1,6 @@
 # Face Recognition
 
-![image](https://user-images.githubusercontent.com/76737266/227038931-7961793a-2842-464a-8dfb-d75eda3596ac.png)
+![image](https://user-images.githubusercontent.com/76737266/227039714-317da33a-0c55-4fb9-941b-a7634e1fdd48.png)
 
 
 ## Introdução
