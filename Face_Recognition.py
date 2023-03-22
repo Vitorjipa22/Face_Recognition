@@ -4,10 +4,10 @@ import numpy as np
 import time as tm
 import pandas as pd
 
-from mtcnn.mtcnn import MTCNN
 from datetime import datetime
 from PIL import Image
-from numpy import asarray
+from embedds import get_embedding
+from facedetector import FaceDetector
 
 def extract_face(image, box, required_size = (160,160)):
 
@@ -23,103 +23,81 @@ def extract_face(image, box, required_size = (160,160)):
 
     return np.asarray(image)
 
-def get_embedding(facenet, face_pixels):
+def distance(encod, encod2):
+    return np.linalg.norm(encod-encod2)
 
-    face_pixels = face_pixels.astype('float32')
+def verifica_pessoa(banco, pessoa):
+    banco = np.array(banco)
+    menor_dist = 100
+    id = 'irineu'
+    for i in range(banco.shape[0]):
+        dist = distance(banco[i,:-1],pessoa)
+        if (dist < menor_dist):
+            id = banco[i,-1]
+            menor_dist = dist
 
-    mean, std = face_pixels.mean(), face_pixels.std()
-    face_pixels = (face_pixels - mean)/std
-    
-    samples = np.expand_dims(face_pixels, axis=0)
-    
-    yhat = facenet.predict(samples)
-    
-    return yhat[0]
+    return menor_dist, id
 
-moradores = pd.read_csv("moradores.csv")
-moradores = moradores.moradores
-moradores = list(moradores)
-
-pessoas = asarray(moradores)
-
-df = pd.read_csv("faces.csv")
+df = pd.read_csv("embedds.csv")
 df = df.drop(["Unnamed: 0"], axis = 1)
 
-num_classes = len(pessoas)
 cap = cv2.VideoCapture(0)
 
-detector = MTCNN()
-facenet = tensorflow.keras.models.load_model('facenet_keras.h5')
-model = tensorflow.keras.models.load_model('faces.h5')
+detector = FaceDetector()
+model = tensorflow.keras.models.load_model('models\\facenet_keras.h5')
 
-liberado = True
-time = 0
-color_desconhecido = (0,0,255)
-color = (0,255,0)
+color_desconhecido = (34,34,178)
+color = (225,105,65)
 font_scale = 0.5
 font = cv2.FONT_HERSHEY_SIMPLEX
-time = int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S'))
-tm.sleep(2)
+time = 0
+                                                   
+tm.sleep(1)
 
 while True:
-
+    ini = tm.time()
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)
+    faces, bbox = detector.findFaces(frame, draw = False)
+    cTime = tm.time()
+    fps = 1 / (cTime - time)
+    time = cTime
 
-    faces = detector.detect_faces(frame)
+    for bb in bbox:
+        x1, y1, w, h = bb[1]
 
-    for face in faces:
+        try:
+            face = extract_face(frame, bb[1])
+        except:
+            continue
 
-        confidence = face['confidence']*100
+        emb = get_embedding(model, face)
 
-        if confidence >= 96:
-            
-            x1, y1, w, h = face['box']
+        dist, pessoa = verifica_pessoa(df, np.array(emb))
 
-            face = extract_face(frame, face['box'])
-            face = face.astype('float32')/255 #normalizando a imagem
+        if dist < 10:
+            frame = detector.fancyDraw(img =frame, bbox = bb[1], color=color)
+            cv2.putText(frame, pessoa, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
 
-            emb = get_embedding(facenet, face)
-            tensor = np.expand_dims(emb, axis = 0) #expandindo para possibilitar varias faces
+        else:
+            frame = detector.fancyDraw(img = frame ,bbox = bb[1] , color=color_desconhecido)
+            cv2.putText(frame, 'desconhecido', (x1, y1-10), font, fontScale=font_scale, color= color_desconhecido, thickness = 1)
 
-            predict_x=model.predict(tensor)[0]
-            classe=np.argmax(predict_x)
-            user = str(pessoas[classe]).upper()
-
-            if (predict_x[classe]*100) >= 98:
-
-                liberado = True if user != 'DESCONHECIDOS' else False
-
-                if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) <= time+3):
-   
-                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
-                    cv2.putText(frame, usertemp, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
-
-                if(liberado != True and int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S')) > time+3):
-  
-                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color_desconhecido, 2)
-                    cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color_desconhecido, thickness = 1)
-                
-                if liberado:
-    
-                    time = int(datetime.now().strftime('%M'))*60 + int(datetime.now().strftime('%S'))
-                    cv2.rectangle(frame, (x1,y1), (x1+w, y1+h), color, 2)
-                    cv2.putText(frame, user, (x1, y1-10), font, fontScale=font_scale, color= color, thickness = 1)
-                    usertemp = user
-
+    frame = cv2.resize(frame, (700, 520))
+    cv2.putText(frame, f'FPS: {int(fps)}', (20, 20), font, fontScale=font_scale, color = color, thickness = 1)
     cv2.imshow("FACE_RECOGNITION", frame)
 
     key = cv2.waitKey(1)
 
     if key == 27:
         break
-
-    if key == 13:
-        print(predict_x)
-        tm.sleep(10)
     
     if key != 27 and key != 13 and key != -1:
         print(key)
 
+    t6 = tm.time() - ini
+
 cap.release()
 cv2.destroyAllWindows
+
+print(f'<- tempo iteração t6: {t6} ->')
