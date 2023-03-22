@@ -47,7 +47,7 @@ detector = FaceDetector()
 model = tensorflow.keras.models.load_model('models\\facenet_keras.h5')
 
 color_desconhecido = (34,34,178)
-color = (225,105,65)
+color = (225,255,0)
 font_scale = 0.5
 font = cv2.FONT_HERSHEY_SIMPLEX
 time = 0
