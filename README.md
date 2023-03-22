@@ -1,5 +1,8 @@
 # Face Recognition
 
+![image](https://user-images.githubusercontent.com/76737266/227039714-317da33a-0c55-4fb9-941b-a7634e1fdd48.png)
+
+
 ## Introdução
 
 Este programa tem a função de fazer a detecção e a identificação facial. Caso a pessoa esteja com cadastrada o algoritmo deve reconhecer a pessoa e mostrar o seu nome. Caso a pessoa não esteja no banco de dados ela deve ser classificada como desconhecida
